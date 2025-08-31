@@ -5,7 +5,7 @@ The first video was released on 8/31/2025.
 https://youtu.be/HprpKnJW7kg
 
 
-The d64 images were uploaded in the other in which progress was made while I was making the video.  
+The d64 images were uploaded in the order in which progress was made while I was making the video.  
 Files 1 through 5 are from the first video.
 
 
