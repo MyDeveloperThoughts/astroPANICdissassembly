@@ -9,7 +9,8 @@ The d64 images were uploaded in the other in which progress was made while I was
 Files 1 through 5 are from the first video.
 
 
-
+The individual d64 images are snapshots of the evolution of the source code as it was being disassembled in the video.  
+The file **astro-latest-sourcecode** is the real time latest version as I am still disassembling.
 
 - Chris
 
