@@ -19,6 +19,9 @@ The file **astro-latest-sourcecode** is the real time latest version as I am sti
 COMPUTE's GAZETTE February 1984 (AstroPANIC)  
 https://www.commodore.ca/gallery/magazines/gazette/Compute-Gazette-Issue-08-01.pdf
 
+Mapping the C64 Book.  
+https://archive.org/details/Compute_s_Mapping_the_Commodore_64
+
 COMPUTE's GAZETTE August 1984 (Sprite Magic)  
 https://www.commodore.ca/gallery/magazines/gazette/Compute-Gazette-Issue-14-01.pdf
 
