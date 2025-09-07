@@ -1,0 +1,51 @@
+Updated Merlin (Merlin-64-custom) with..
+Labels:   Max Length is 13 characters
+Tabs: 21,27,38   (This is the last data statement in the basic loader)
+
+Code Flow:
+ORG $C000
+
+Jump to Start
+
+Install IRQ:
+    Disables default int CIA timer
+    Installs a raster IRQ at 0314 for raster line 233
+    rts
+
+Raster IRQ:
+    (VIC CHIP BANK 0  DD00-   Char Rom: $1000-$1FFF)
+    Bottom part of screen (Raster 233+)
+      VIC Set to standard 40 col text mode
+      CharData: 1800   Screen: 0400 (1000 is normal rom, 1800 is reverse chars rom)
+      Border + Screen medium grey
+      RTI
+
+    Top part of screen (Raster 0+)
+      VIC Set to multicolor 40 col text mode
+      CharData: 3800   Screen: 0400
+      Border + Screen black
+      If not paused (Shift Key not pressed)  RTI
+
+      Set Players Sprite X Position
+           Set sprite 0 to DATPLAYERX (bits 0-7) $D000
+           Load to Accumulator all sprites bit 8 ($D010)
+           AND it with FE (11111110)
+           Then or it with DATPLAYERX8 to set our cannon position
+
+
+Start:
+   JSR InstallIRQ
+   ...
+
+
+Data: (C65A and up)
+DATPLYRX  = $C659 (Cannon X position bits 0-7)
+DATSPRT8  = $C65A (All Sprites bit 8)
+DATNOPAUSE = $C689
+            Initially set to 0
+            If 1 = the IRQ Handler will ignore the shift key to pause logic
+            Seems to be a flag if we should honor the shift key down / pause idea
+DATLEVEL   = $C68B
+            Current level of the game.  Starts 15 and goes down.
+            When printed, it is XORed with 15 so it prints starting at 0 and goes up to 15
+
