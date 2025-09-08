@@ -32,6 +32,7 @@ Raster IRQ:
            AND it with FE (11111110)
            Then or it with DATPLAYERX8 to set our cannon position
 
+            Read $DC00 ?
 
 Start:
    JSR InstallIRQ
