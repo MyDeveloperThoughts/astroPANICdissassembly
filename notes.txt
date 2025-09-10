@@ -32,11 +32,25 @@ Raster IRQ:
            AND it with FE (11111110)
            Then or it with DATPLAYERX8 to set our cannon position
 
-            Read $DC00 ?
+      Read $DC00 / Is the fire button pressed?
+      Nope - Exit IRQ
+      If it is pressed, EXIT IRQ if a bullet is already in flight   HC658 = DATBLTMV
+
+      Translate the position of the bulletr from the Sprite x (0-319) to character x (0-39)
+      Calculate the screen ram address and color ram address of the bullet and store in FBFC FDFE
+      EXIT IRQ
 
 Start:
    JSR InstallIRQ
    ...
+   HC1F1 Loop through the seven saucers
+       Set all Y positions to 0  (C65C 0-6) DATSAUCERY)   Sprite Y positions for saucers
+       Set all X positions to ?+31 (C65B 0-6 DATSAUCERX)  Sprite X positions for saucers
+       (Where does the 8th bit go I wonder?)
+
+   HC21E Seems to be the main game loop
+      Check if Cannon hit a sprite
+      If so, jmp to HC3E6 = LOSELIFE (This is probably the explosion logic)
 
 
 Data: (C65A and up)
@@ -50,3 +64,10 @@ DATLEVEL   = $C68B
             Current level of the game.  Starts 15 and goes down.
             When printed, it is XORed with 15 so it prints starting at 0 and goes up to 15
 
+
+
+Sprite Shapes:
+  232 E8 = Cannon
+  233 E9 = Saucer
+  234 EA = Explosion
+  235 EB = Cannon 2
