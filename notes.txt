@@ -3,54 +3,92 @@ Labels:   Max Length is 13 characters
 Tabs: 21,27,38   (This is the last data statement in the basic loader)
 
 Code Flow:
-ORG $C000
+            ORG $C000
 
-Jump to Start
+            Jump to Start
 
-Install IRQ:
-    Disables default int CIA timer
-    Installs a raster IRQ at 0314 for raster line 233
-    rts
+            Install IRQ:
+ INSIRQ     Disables default int CIA timer
+                Installs a raster IRQ at 0314 for raster line 233
+                rts
 
-Raster IRQ:
-    (VIC CHIP BANK 0  DD00-   Char Rom: $1000-$1FFF)
-    Bottom part of screen (Raster 233+)
-      VIC Set to standard 40 col text mode
-      CharData: 1800   Screen: 0400 (1000 is normal rom, 1800 is reverse chars rom)
-      Border + Screen medium grey
-      RTI
+            Raster IRQ:
+IRQH            If we are not on raster 233, jump to RASTERLN0
+                Bottom part of screen (Raster 233+)
+                VIC CHIP BANK 0  DD00-   Char Rom: $1000-$1FFF
+                VIC Set to standard 40 col text mode
+                CharData: 1800   Screen: 0400 (1000 is normal rom, 1800 is reverse chars rom)
+                Border + Screen medium grey
+                Go to EXITIRQ
 
-    Top part of screen (Raster 0+)
-      VIC Set to multicolor 40 col text mode
-      CharData: 3800   Screen: 0400
-      Border + Screen black
-      If not paused (Shift Key not pressed)  RTI
+RASTERLN0       Top part of screen (Raster 0+)
+                VIC Set to multicolor 40 col text mode
+                CharData: 3800   Screen: 0400
+                Border + Screen black
+                If not paused (Shift Key not pressed)  RTI
+SETPLYRX        Set Players Sprite X Position
+                     Set sprite 0 to DATPLAYERX (bits 0-7) $D000
+                     Load to Accumulator all sprites bit 8 ($D010)
+                     AND it with FE (11111110)
+                     Then or it with DATPLAYERX8 to set our cannon position
+                Check for joystick going left (Read $DC00)
+GOLEFT          Move cannon left 2 pixels
+                Check for joystick going right
+GORIGHT         Move cannon right 2 pixels
+ISFIREBTN       Is the fire button pressed?
+                Nope - Exit IRQ
+                If it is pressed, EXIT IRQ if a bullet is already in flight   (DATBLTMV=1)
+                Translate the position of the bulletr from the Sprite x (0-319) to character x (0-39)
+                Calculate the screen ram address and color ram address of the bullet and store in FBFC FDFE
+EXITIRQ
 
-      Set Players Sprite X Position
-           Set sprite 0 to DATPLAYERX (bits 0-7) $D000
-           Load to Accumulator all sprites bit 8 ($D010)
-           AND it with FE (11111110)
-           Then or it with DATPLAYERX8 to set our cannon position
+            Start:
+START          JSR InstallIRQ
+               Set fbfc to point to 0x400 (txt ram)
+BLTLLP         Load bullet custom character to 0x3800
+ZERO8          Create empty custom character to 0x3900
+SPRLDLP        Load 4 sprites shapes into $3A00
+SCSPLP         Assign sprite points at 07f8 to:
+                 232 E8 = Cannon
+                 233 E9 = Saucer
+                 234 EA = Explosion
+                 235 EB = Cannon 2
+                For all sprites:
+                  Multicolor enabled
+                  Normal width and height
+                  bit 8 = 0
+                  Set shared sprites multicolors (patterns 01 and 11) to 3(Cyan) and 4(Purple)
+                  Set cannon y position to 212
+SAUCLRLP        Assign saucer colors from lookup table (patterns 10)
+                Set Cannon sprite color to blue
+                Clear the screen
+INITLN1         Fill Screen row 24 with reverse spaces
+                Set the colors in color ram of row 24 to green
+PSCHS           Write the bottom line out (Score: 000000  High Score: 000000)
+TTLPLOT         Write game title, lives and lvl to row 23
+TTLLP
+SETMCTXTCLRS    Set BG Color 2 (shared Multicolor text to 2 (purple))
+                Set BG Color 3 (shared Multicolor text to 2 (lt blue))
+INITSID         Set All SID Registers 0
+                Volume to 0
+                Voice 3: Freq=ff00, noise waveform, vol=1, (low,band,hi filters off)
+                Set game level to 0 (00001111 15 is level 0, 15 is level 1 etc..)
+                Store 3 into $C688?  No idea yet
+INITCANNONX     Set Cannon X position 184
+                Set flags for bullet is moving to off
+                Set flag for DoNotAllowPause to off
+INITSAUCERXY    Initialize The saucer positions
+                   Set all Y positions to 0  (C65C 0-6) DATSAUCERY)   Sprite Y positions for saucers
+                   Set all X positions to ?+31 (C65B 0-6 DATSAUCERX)  Sprite X positions for saucers
+                   (Where does the 8th bit go I wonder?)
+                Make all sprites visible
+                Rest collision detection for sp to sp and sp to char
 
-      Read $DC00 / Is the fire button pressed?
-      Nope - Exit IRQ
-      If it is pressed, EXIT IRQ if a bullet is already in flight   HC658 = DATBLTMV
+ 254            HC21E Seems to be the main game loop
+                  Check if Cannon hit a sprite
+                  If so, jmp to HC3E6 = LOSELIFE (This is probably the explosion logic)
 
-      Translate the position of the bulletr from the Sprite x (0-319) to character x (0-39)
-      Calculate the screen ram address and color ram address of the bullet and store in FBFC FDFE
-      EXIT IRQ
 
-Start:
-   JSR InstallIRQ
-   ...
-   HC1F1 Loop through the seven saucers
-       Set all Y positions to 0  (C65C 0-6) DATSAUCERY)   Sprite Y positions for saucers
-       Set all X positions to ?+31 (C65B 0-6 DATSAUCERX)  Sprite X positions for saucers
-       (Where does the 8th bit go I wonder?)
-
-   HC21E Seems to be the main game loop
-      Check if Cannon hit a sprite
-      If so, jmp to HC3E6 = LOSELIFE (This is probably the explosion logic)
 
 
 Data: (C65A and up)
@@ -66,8 +104,3 @@ DATLEVEL   = $C68B
 
 
 
-Sprite Shapes:
-  232 E8 = Cannon
-  233 E9 = Saucer
-  234 EA = Explosion
-  235 EB = Cannon 2
