@@ -104,3 +104,118 @@ DATLEVEL   = $C68B
 
 
 
+
+The Math to move the bullet up a line on the screen
+fb,fc (lohi of txt ram)   $0400 - Start of txt
+fd,fe (lohi of clr ram)   $D800 - Start of color
+
+Example:  TXT RAM $0428   (This is x=0 y=1 on the screen)
+          CLR RAM $D800   Subtracts 40 from 0428 = 0400.  Takes 04 + d4 to get d8 stores in colorram hi
+
+
+When a bullet hits a sprite: the sound:
+
+What is hc669?
+
+
+
+
+
+
+
+
+
+Manual breakdown of how INITSAUCERXY works
+				Code when X is 6  (Saucers 0..6)
+INITSAUCERXY	txa	set all saucer init x y      -> a=6   x=6
+				asl								 -> a=12  x=6
+				tay					             -> a=12  x=6 y=12
+				asl                              -> a=24  x=6 y=12
+				asl								 -> a=48  x=6 y=12
+				asl								 -> a=96  x=6 y=12
+				asl							     -> a=192 x=6 y=12
+				clc								 -> a=192 x=6 y=12 c=0
+				adc #$1F						 -> a=223 x=6 y=12 c=0
+				sta datsaucrxlo,y
+				lda #0
+				sta datsaucrxhi,y
+				sta $d003,y       (Set Saucer Y position)
+				lda #$3c		  3c=60=0011 1100  -> a=60 x=0 y=0 c=0
+				sta datsaucy,x       (1 byte per sprite 0011 1100)
+				jsr hc3ba		   -> a=223 x=2 y=12 c=0
+				inx				  move to next sprite
+				cpx #7
+				bne INITSAUCERXY
+
+(Saucers 0..6)  Y=x*2   a=x position of sprite (0,31,63,95...223)  (Never > 255)
+-> x=6 y=12 c=0  (Called from initsaucerxy with this data loaded)
+RNDIZSCRDIR     stx $a9         $a9 = 6     Saucer index             (line 445)
+                sty $aa         $aa = 12    Saucer hi/lo index
+                lda #$d41b      read random #
+                and #0101       Random of 0,1, 4, or 5    (Could be a direction facing?)
+                tax             x = random number
+                lda hc646,x     load in something index by 0,1,4 or 5
+                ldx $a9         load in the sprite index
+                sta hc670,x     ? store looked up value index by sprite #
+                lda $d41b       read random #
+                and $0101       Random of 0,1, 4, or 5    (Could be a direction facing?)
+                asl             Becomes random of 0, 2, 8, or 10
+                tay             y = this
+                lda hc64c,y
+                ldx $aa
+                sta hc678,x
+                lda hc64d,y
+                sta hc679,x
+                ldy $aa
+                ldx $a9
+                rts
+
+datscrdir8  is hc646    (6 somethings)
+datscrdir16 is hc64c    (6 lo/hi something)
+
+test 1: make all 6 entries at zinn 00   // Saucer move only left to right
+test 2: make all 6 entiies at zinn ff   // They all move up and freeze
+Safe to say that ZINN is a lookup of directions to move in
+
+
+
+
+
+
+There is an explosion.
+sound is made, and now it is restored
+X = Sprite number to test for collision (1-7)
+A = Y position of the sprite
+        txa
+        pha
+        lda     datsaucy,x
+        eor     #$ff
+        lsr
+        lsr
+        lsr
+        jsr HC4C9
+        pla
+        tax
+        ... loop logic
+
+X = Sprite number to test for collision (1-7)   (y=60 to test)
+A = Y position of the sprite
+07CA..07CF = PETSCII values of the score (000000)
+48=0...57=9  (58=':' one char beyond 9)
+ADDTOSCORE  tax                             A=60  X=60
+ADDSCLP1    ldy #6                          A=60  X=60 y=6
+            sec
+ADDSCLP2    lda $07CA,y                     a='0' x=60 y=6
+            adc #0                          a='0' x=60 y=6  (Add the carry)
+            cmp #$3A    (58 0011 1010) ':'  (Are we beyond 9?) (Carry set if >9)
+            bcc SCSETDIGIT                   No
+            lda #$30    (48 0011 0000) '0'  Set it to 0
+SCSETDIGIT  sta $07ca,y                     Write to the screen
+            dey                             a=digit x=60 y=5
+            bne ADDSCLP2                    y is not 0 yet
+            dex
+            BNE ADDSCLP1                    x is not 0 yet
+            rts
+
+Higher score the higher the alien
+
