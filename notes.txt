@@ -117,14 +117,6 @@ When a bullet hits a sprite: the sound:
 
 What is hc669?
 
-
-
-
-
-
-
-
-
 Manual breakdown of how INITSAUCERXY works
 				Code when X is 6  (Saucers 0..6)
 INITSAUCERXY	txa	set all saucer init x y      -> a=6   x=6
@@ -222,3 +214,55 @@ Higher score the higher the alien
 
 Line 255 HC688 / DATLIVES    Lives is stored here AND on the screen
 $079e is were lives is stored on the screen as petscii of course
+
+
+
+HC326 What is going at 376.   Paint all sprites to their current x,y locations
+x=level(1 for example)  (saucer index 0..6)   (y=saucer index * 2)
+hc326   txa                 x=1     a=1
+        asl                 x=1     a=2
+        tay                 x=1     a=2      y=2
+        lda datsaucxlo,y    x=1     a=?      y=2
+        sta $d002,y
+        lda datasaucy,x     x=1     a=?      y=2
+        sta $d003,y
+        lda datsuachxhi,y   x=1     a=?      y=2
+        sta $a8                                             // we may come back to this in a bit. a8=hibit of y position of sprite
+        sec
+        txa                 x=1     a=1      y=2
+        tay                 x=1     a=1      y=1
+        iny                 x=1     a=1      y=2
+        iny                 x=1     a=1      y=3
+        lda #$00            x=1     a=0      y=3
+hc341   rol                 x=1     a=1      y=3   (a=1 because the carry flag came in from the right)
+        dey                 x=1     a=1      y=2
+        bne hc341           ....    a=4      y=0 (after a few loops)
+        sta $a7                     a=4
+        eor $ff                     a=11111011 / 251
+        and $d010                   (Combine accumulte with all sprtites MSB for sprites)
+        ldy $a8                     (load hibit of x stored earlier from current sprite)
+        beq HC352                   if existing sprites are all 0, goto hc352
+        ora $a7                     combine existing flags with our new hibit
+hc352   sta $d010                   Set all hibits for sprites
+        inx                         move to the next sprite
+        cpx #7                      are we done?
+        bne hc326                   nope, go back to loop
+
+
+        ldx #0
+hc35c   txa
+        asl
+        tay
+        lda datsaucy,x
+        clc
+        adc cpyscrdir8,x
+        cmp #$D2
+        bcs hc36e
+        cmp #$32
+        bcs hc374
+hc363   jsr rndizscrdir
+
+
+
+
+
