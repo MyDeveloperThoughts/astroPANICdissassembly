@@ -219,3 +219,6 @@ SCSETDIGIT  sta $07ca,y                     Write to the screen
 
 Higher score the higher the alien
 
+
+Line 255 HC688 / DATLIVES    Lives is stored here AND on the screen
+$079e is were lives is stored on the screen as petscii of course
