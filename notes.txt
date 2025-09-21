@@ -263,6 +263,23 @@ hc35c   txa
 hc363   jsr rndizscrdir
 
 
+LoseLife Logic
 
 
 
+dayplyrx8 = C65A
+
+Astro-Dissembled.d64  <- full disassembly in Merlin
+
+--------------------  About to manually re-assign these for relocatable version
+Moveable data section before assigning data+ offsets:
+DATPLYRX8       = $C65A
+DATSAUCXLO      = $C65B
+DATSAUCXHI      = $C65C
+DATSAUCY        = $C669
+CPYSCRDIR8      = $C670
+CPYSCRDIR16     = $C678
+DATLIVES        = $C688
+DATNOPAUSE      = $C689
+DATSP2CHRSLT    = $C68A
+DATLEVEL        = $C68B
