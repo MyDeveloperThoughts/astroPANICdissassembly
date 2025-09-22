@@ -273,13 +273,14 @@ Astro-Dissembled.d64  <- full disassembly in Merlin
 
 --------------------  About to manually re-assign these for relocatable version
 Moveable data section before assigning data+ offsets:
-DATPLYRX8       = $C65A
-DATSAUCXLO      = $C65B
-DATSAUCXHI      = $C65C
-DATSAUCY        = $C669
-CPYSCRDIR8      = $C670
-CPYSCRDIR16     = $C678
-DATLIVES        = $C688
-DATNOPAUSE      = $C689
-DATSP2CHRSLT    = $C68A
-DATLEVEL        = $C68B
+DATA            = $C65A (First memory address beyond end of the binary)
+DATPLYRX8       = $C65A data
+DATSAUCXLO      = $C65B data + 1
+DATSAUCXHI      = $C65C data + 2
+DATSAUCY        = $C669 data + 15
+CPYSCRDIR8      = $C670 data + 22
+CPYSCRDIR16     = $C678 data + 30
+DATLIVES        = $C688 data + 46
+DATNOPAUSE      = $C689 data + 47
+DATSP2CHRSLT    = $C68A data + 48
+DATLEVEL        = $C68B data + 49
