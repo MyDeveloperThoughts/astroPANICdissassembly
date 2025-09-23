@@ -284,3 +284,14 @@ DATLIVES        = $C688 data + 46
 DATNOPAUSE      = $C689 data + 47
 DATSP2CHRSLT    = $C68A data + 48
 DATLEVEL        = $C68B data + 49
+
+
+SHSTXT          = $C5F4
+
+[Bad]
+85F6 73 63 6f 72 65 Score
+
+[Correct]
+85F6 d3 43 4f 52 45 Score
+
+ttltxt=$C619

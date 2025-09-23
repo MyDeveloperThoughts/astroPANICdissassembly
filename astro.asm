@@ -693,11 +693,17 @@ sprites:    .byte $00,$00,$00,$00,$00,$00,$00,$20
             .byte $00,$0d
 sauclrs:    .byte $06,$04,$01,$07,$08,$0c,$0d
             .byte $0e
-shstxt:     .byte $08,$1f,$d3,$43,$4f,$52
-            .byte $45,$3a,$9e,$30,$30,$30,$30,$30
-            .byte $30,$20,$20,$95,$c8,$49,$47,$48
-            .byte $20,$d3,$43,$4f,$52,$45,$3a,$1c
-            .byte $30,$30,$30,$30,$30,$30,$00
+shstxt:     .byte $08,$1f           // disable shft+c=  blue
+
+            .encoding "petscii_mixed"
+            .text "Score:"
+            .byte $9e               // Yellow
+            .text "000000  "
+            .byte $95               // Brown
+            .text "High Score:"
+            .byte $1c               // Red
+            .text "000000"
+            .byte $00
 ttltxt:     .byte $12
             .byte $95,$cc,$49,$56,$45,$53,$3a,$33,$1d,$1d,$1d,$1d,$1d,$1d,$1d,$1c
             .byte $c1,$53,$54,$52,$4f,$2d,$d0,$c1,$ce,$c9,$c3,$21,$1d,$1d,$1d,$1d
