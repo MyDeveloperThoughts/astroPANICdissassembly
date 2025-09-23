@@ -295,3 +295,7 @@ SHSTXT          = $C5F4
 85F6 d3 43 4f 52 45 Score
 
 ttltxt=$C619
+[12=rvrs on][95=brown]Lives:3[1d cursor right x7][1c=red]
+Astro-PANIC!][1d cursor right x6][1f=blue]
+level:0[space][null]
+

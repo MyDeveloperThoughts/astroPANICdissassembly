@@ -704,10 +704,13 @@ shstxt:     .byte $08,$1f           // disable shft+c=  blue
             .byte $1c               // Red
             .text "000000"
             .byte $00
-ttltxt:     .byte $12
-            .byte $95,$cc,$49,$56,$45,$53,$3a,$33,$1d,$1d,$1d,$1d,$1d,$1d,$1d,$1c
-            .byte $c1,$53,$54,$52,$4f,$2d,$d0,$c1,$ce,$c9,$c3,$21,$1d,$1d,$1d,$1d
-            .byte $1d,$1d,$1f,$cc,$45,$56,$45,$4c,$3a,$30,$20,$00
+ttltxt:     .byte $12,$95           // Rvrs on  brown
+            .text "Lives:3"
+            .byte $1d,$1d,$1d,$1d,$1d,$1d,$1d,$1c  // crsr right x7 red
+            .text "Astro-PANIC!"
+            .byte $1d,$1d,$1d,$1d,$1d,$1d,$1f      // crsr right x6 blue
+            .text "Level:0 "
+            .byte $00
 datscrdir8: .byte $01,$ff,$02,$fe,$03,$fd
 datscrdir16:.byte $01,$00,$ff,$ff,$02,$00,$fe,$ff,$03,$00,$fd,$ff
 datbltmv:   .byte $0d
